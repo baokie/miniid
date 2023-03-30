@@ -168,19 +168,13 @@
 						type.textContent = item.type;
 						const msg = document.createElement('div'); // 新增msg显示
 						msg.textContent = item.msg;
+						itemContainer.appendChild(id);
 						itemContainer.appendChild(img);
-						itemContainer.appendChild(name);
-						itemContainer.appendChild(type); // 添加type显示
-						itemContainer.appendChild(msg); // 添加msg显示
+						itemContainer.appendChild(name); // 添加type显示
+						//itemContainer.appendChild(msg); // 添加msg显示
 						td.appendChild(itemContainer);
 						td.addEventListener('click', () => {
-							const message = `
-								ID: ${item.id}
-								Name: ${item.name}
-								Type: ${item.type}
-								Message: ${item.msg}
-							`;
-							alert(message, {html: img});
+							alert(`代码: ${item.id}\n名称: ${item.name}\n类型: ${item.type}\n信息: ${item.msg}`, img);
 						});
 						tbody.appendChild(td);
 						if ((i + 1) % 10 === 0 || i === endIndex - 1) {
