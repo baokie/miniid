@@ -61,11 +61,11 @@
 				});
 
 				// 设置每页显示的数量
-				const pageSize = 300;
+				const pageSize = 1000;
 
 				// 初始化分页和搜索
-				let  currentPage = 1;
-				const totalPages = Math.ceil(items.length / pageSize);
+				let currentPage = 1;
+				let filteredItems = items;
 				const tableContainer = document.getElementById('tableContainer');
 				const searchInput = document.getElementById('searchInput');
 				const searchButton = document.getElementById('searchButton');
@@ -92,9 +92,9 @@
 					// 创建表格内容
 					let tbody = document.createElement('tbody');
 					const startIndex = (currentPage - 1) * pageSize;
-					const endIndex = Math.min(startIndex + pageSize, items.length);
+					const endIndex = Math.min(startIndex + pageSize, filteredItems.length);
 					for (let i = startIndex; i < endIndex; i++) {
-						const item = items[i];
+						const item = filteredItems[i];
 						const td = document.createElement('td');
 						const itemContainer = document.createElement('div');
 						itemContainer.classList.add('item-container');
@@ -105,6 +105,9 @@
 						itemContainer.appendChild(img);
 						itemContainer.appendChild(name);
 						td.appendChild(itemContainer);
+						td.addEventListener('click', () => {
+							alert(`ID: ${item.id}\nType: ${item.type}\nMessage: ${item.msg}`);
+						});
 						tbody.appendChild(td);
 						if ((i + 1) % 10 === 0) {
 							const tr = document.createElement('tr');
@@ -127,7 +130,7 @@
 						});
 						pagination.appendChild(prevButton);
 					}
-					if (currentPage < totalPages) {
+					if (currentPage < totalPages()) {
 						const nextButton = document.createElement('button');
 						nextButton.textContent = '下一页';
 						nextButton.addEventListener('click', () => {
@@ -140,17 +143,42 @@
 					tableContainer.appendChild(pagination);
 				}
 
+				// 计算总页数
+				function totalPages() {
+					return Math.ceil(filteredItems.length / pageSize);
+				}
+
+				// 分类功能
+				const types = Array.from(new Set(items.map(item => item.type))); // 获取所有不重复的type
+				const typeButtons = types.map(type => {
+					const button = document.createElement('button');
+					button.textContent = type;
+					button.addEventListener('click', () => {
+						filteredItems = items.filter(item => item.type === type);
+						currentPage = 1;
+						renderTable();
+					});
+					return button;
+				});
+				const typeContainer = document.createElement('div');
+				typeContainer.appendChild(document.createTextNode('按类型筛选：'));
+				typeButtons.forEach(button => typeContainer.appendChild(button));
+				document.body.insertBefore(typeContainer, tableContainer);
+
 				// 搜索功能
 				searchButton.addEventListener('click', () => {
 					const keyword = searchInput.value.trim().toLowerCase();
 					if (keyword) {
-						const filteredItems = items.filter(item => item.name.toLowerCase().includes(keyword));
+						filteredItems = items.filter(item => item.id.includes(keyword) || item.name.toLowerCase().includes(keyword));
 						if (filteredItems.length > 0) {
 							currentPage = 1;
 							renderTable();
 						} else {
 							alert('没有找到匹配项。');
 						}
+					} else {
+						filteredItems = items;
+						renderTable();
 					}
 				});
 			})
