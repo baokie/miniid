@@ -174,7 +174,13 @@
 						itemContainer.appendChild(msg); // 添加msg显示
 						td.appendChild(itemContainer);
 						td.addEventListener('click', () => {
-							alert(`ID: ${item.id}\nName: ${item.name}\nType: ${item.type}\nMessage: ${item.msg}`, img);
+							const message = `
+								ID: ${item.id}
+								Name: ${item.name}
+								Type: ${item.type}
+								Message: ${item.msg}
+							`;
+							alert(message, {html: img});
 						});
 						tbody.appendChild(td);
 						if ((i + 1) % 10 === 0 || i === endIndex - 1) {
