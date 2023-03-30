@@ -64,7 +64,7 @@
 				const pageSize = 300;
 
 				// 初始化分页和搜索
-				const  currentPage = 1;
+				let  currentPage = 1;
 				const totalPages = Math.ceil(items.length / pageSize);
 				const tableContainer = document.getElementById('tableContainer');
 				const searchInput = document.getElementById('searchInput');
@@ -90,7 +90,7 @@
 					table.appendChild(thead);
 
 					// 创建表格内容
-					const tbody = document.createElement('tbody');
+					let tbody = document.createElement('tbody');
 					const startIndex = (currentPage - 1) * pageSize;
 					const endIndex = Math.min(startIndex + pageSize, items.length);
 					for (let i = startIndex; i < endIndex; i++) {
