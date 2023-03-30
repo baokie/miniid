@@ -59,8 +59,8 @@
 	<input type="text" id="searchInput" placeholder="搜索...">
 	<button id="searchButton">搜索</button>
 	<div id="typeContainer"></div> <!-- 新增分类按钮显示区域 -->
-	<div id="tableContainer"></div>
 	<div id="paginationContainer"></div> <!-- 新增分页控件显示区域 -->
+	<div id="tableContainer"></div>
 
 	<script>
 		// 读取数据文件
@@ -91,54 +91,6 @@
 				function renderTable() {
 					// 清空容器
 					tableContainer.innerHTML = '';
-
-					// 创建表格元素
-					const table = document.createElement('table');
-					table.classList.add('table');
-
-					// 创建表头
-					const thead = document.createElement('thead');
-					const tr = document.createElement('tr');
-					const th = document.createElement('th');
-					th.textContent = `第 ${currentPage} 页 / 共 ${totalPages()} 页`;
-					tr.appendChild(th);
-					thead.appendChild(tr);
-					table.appendChild(thead);
-
-					// 创建表格内容
-					let tbody = document.createElement('tbody');
-					const startIndex = (currentPage - 1) * pageSize;
-					const endIndex = Math.min(startIndex + pageSize, filteredItems.length);
-					for (let i = startIndex; i < endIndex; i++) {
-						const item = filteredItems[i];
-						const td = document.createElement('td');
-						const itemContainer = document.createElement('div');
-						itemContainer.classList.add('item-container');
-						const img = document.createElement('img');
-						img.src = `ico/${item.id}.png`;
-						const name = document.createElement('div');
-						name.textContent = item.name;
-						const type = document.createElement('div'); // 新增type显示
-						type.textContent = item.type;
-						const msg = document.createElement('div'); // 新增msg显示
-						msg.textContent = item.msg;
-						itemContainer.appendChild(img);
-						itemContainer.appendChild(name);
-						itemContainer.appendChild(type); // 添加type显示
-						itemContainer.appendChild(msg); // 添加msg显示
-						td.appendChild(itemContainer);
-						td.addEventListener('click', () => {
-							alert(`ID: ${item.id}\nType: ${item.type}\nMessage: ${item.msg}`);
-						});
-						tbody.appendChild(td);
-						if ((i + 1) % 10 === 0 || i === endIndex - 1) {
-							const tr = document.createElement('tr');
-							tr.appendChild(tbody);
-							table.appendChild(tr);
-							tbody = document.createElement('tbody');
-						}
-					}
-					table.appendChild(tbody);
 
 					// 创建分类按钮
 					const types = Array.from(new Set(items.map(item => item.type))); // 获取所有不重复的type
@@ -183,8 +135,59 @@
 						pagination.appendChild(nextButton);
 					}
 					paginationContainer.innerHTML = ''; // 清空分页控件显示区域
-					paginationContainer.appendChild(pagination);
 					paginationContainer.appendChild(typeContainer); // 将分类按钮移到分页控件上面
+					paginationContainer.appendChild(pagination);
+
+					// 创建表格元素
+					const table = document.createElement('table');
+					table.classList.add('table');
+
+					// 创建表头
+					const thead = document.createElement('thead');
+					const tr = document.createElement('tr');
+					const th = document.createElement('th');
+					th.textContent = `第 ${currentPage} 页 / 共 ${totalPages()} 页`;
+					tr.appendChild(th);
+					thead.appendChild(tr);
+					table.appendChild(thead);
+
+					// 创建表格内容
+					let tbody = document.createElement('tbody');
+					const startIndex = (currentPage - 1) * pageSize;
+					const endIndex = Math.min(startIndex + pageSize, filteredItems.length);
+					for (let i = startIndex; i < endIndex; i++) {
+						const item = filteredItems[i];
+						const td = document.createElement('td');
+						const itemContainer = document.createElement('div');
+						itemContainer.classList.add('item-container');
+						const img = document.createElement('img');
+						img.src = `ico/${item.id}.png`;
+						const name = document.createElement('div');
+						name.textContent = item.name;
+						const type = document.createElement('div'); // 新增type显示
+						type.textContent = item.type;
+						const msg = document.createElement('div'); // 新增msg显示
+						msg.textContent = item.msg;
+						itemContainer.appendChild(img);
+						itemContainer.appendChild(name);
+						itemContainer.appendChild(type); // 添加type显示
+						itemContainer.appendChild(msg); // 添加msg显示
+						td.appendChild(itemContainer);
+						td.addEventListener('click', () => {
+							alert(`ID: ${item.id}\nName: ${item.name}\nType: ${item.type}\nMessage: ${item.msg}`, img);
+						});
+						tbody.appendChild(td);
+						if ((i + 1) % 10 === 0 || i === endIndex - 1) {
+							const tr = document.createElement('tr');
+							tr.appendChild(tbody);
+							table.appendChild(tr);
+							tbody = document.createElement('tbody');
+						}
+					}
+					table.appendChild(tbody);
+
+					// 将表格添加到容器中
+					tableContainer.appendChild(table);
 				}
 
 				// 计算总页数
