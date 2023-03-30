@@ -164,11 +164,11 @@
 						img.src = `ico/${item.id}.png`;
 						const name = document.createElement('div');
 						name.textContent = item.name;
-						const type = document.createElement('div'); // 新增type显示
-						type.textContent = item.type;
+						const id = document.createElement('div'); // 新增id显示
+						id.textContent = item.id;
 						const msg = document.createElement('div'); // 新增msg显示
 						msg.textContent = item.msg;
-						itemContainer.appendChild(item.id);
+						itemContainer.appendChild(id);
 						itemContainer.appendChild(img);
 						itemContainer.appendChild(name); // 添加type显示
 						//itemContainer.appendChild(msg); // 添加msg显示
