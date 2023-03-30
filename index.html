@@ -1,109 +1,142 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>分页展示</title>
-	<style>
-		/* 样式定义 */
-		#list {
-			list-style: none;
-			padding-left: 0;
-		}
-		#list li {
-			display: flex;
-			align-items: center;
-			margin-bottom: 10px;
-			padding: 10px;
-			border: 1px solid #ccc;
-			border-radius: 5px;
-			cursor: pointer;
-		}
-		#list li:hover {
-			background-color: #f0f0f0;
-		}
-		#list li img {
-			width: 50px;
-			height: 50px;
-			margin-right: 10px;
-		}
-		#detail {
-			display: none;
-			margin-top: 10px;
-			padding: 10px;
-			border: 1px solid #ccc;
-			border-radius: 5px;
-		}
-	</style>
+  <meta charset="UTF-8">
+  <title>分页展示项</title>
+  <style>
+    /* 样式 */
+    .item {
+      display: inline-block;
+      width: 150px;
+      height: 150px;
+      margin: 10px;
+      text-align: center;
+      vertical-align: top;
+      cursor: pointer;
+    }
+
+    .item img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* 分页样式 */
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .pagination a {
+      display: inline-block;
+      padding: 5px 10px;
+      margin-right: 10px;
+      background-color: #eee;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .pagination a.active {
+      background-color: #333;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
-	<!-- 搜索框 -->
-	<input type="text" id="search" placeholder="搜索...">
-	<!-- 列表 -->
-	<ul id="list"></ul>
-	<!-- 详细信息 -->
-	<div id="detail"></div>
+  <!-- 搜索框 -->
+  <input type="text" id="search" placeholder="搜索名称">
+  <!-- 展示区域 -->
+  <div id="items"></div>
+  <!-- 分页 -->
+  <div class="pagination"></div>
 
-	<script>
-		// 读取数据文件
-		const dataUrl = 'data.txt';
-		const iconUrl = 'ico/';
-		let dataList = [];
-		fetch(dataUrl)
-			.then(response => response.text())
-			.then(text => {
-				// 解析数据
-				dataList = text.trim().split(/\s*,\s*/).map(item => {
-					const [id, name, type, msg] = item.match(/id:(\d+),name:(.+),type:(\d+),msg:(.+)/).slice(1);
-					return { id, name, type, msg };
-				});
-				// 初始化显示
-				showList(1);
-			});
+  <script>
+    // 读取数据文件
+    fetch('data.txt')
+      .then(response => response.text())
+      .then(text => {
+        // 解析数据
+        const items = text.split(',\n').map(item => {
+          const match = item.match(/\{id:(\d+),name:'([^']*)',type:(\d+),msg:'([^']*)'\}/);
+          if (match) {
+            return {
+              id: match[1],
+              name: match[2],
+              type: match[3],
+              msg: match[4]
+            };
+          }
+        }).filter(item => item !== undefined);
 
-		// 搜索框绑定事件
-		const searchInput = document.querySelector('#search');
-		searchInput.addEventListener('input', () => {
-			showList(1, searchInput.value.trim());
-		});
+        // 创建项的HTML
+        function createItemHTML(item) {
+          return `
+            <div class="item" data-id="${item.id}">
+              <img src="ico/${item.id}.png" alt="${item.name}">
+              <div>${item.name}</div>
+            </div>
+          `;
+        }
 
-		// 列表绑定事件
-		const list = document.querySelector('#list');
-		list.addEventListener('click', event => {
-			const id = event.target.getAttribute('data-id');
-			if (id) {
-				showDetail(id);
-			}
-		});
+        // 显示项
+        function showItems(pageNumber) {
+          const itemsDiv = document.getElementById('items');
+          itemsDiv.innerHTML = '';
 
-		// 显示列表
-		function showList(pageNum, keyword = '') {
-			const startIndex = (pageNum - 1) * 1000;
-			const endIndex = startIndex + 1000;
-			const filteredList = dataList.filter(item => item.name.includes(keyword));
-			const pageList = filteredList.slice(startIndex, endIndex);
-			list.innerHTML = '';
-			for (const item of pageList) {
-				const li = document.createElement('li');
-				const img = document.createElement('img');
-				img.src = `${iconUrl}${item.id}.png`;
-				li.appendChild(img);
-				li.appendChild(document.createTextNode(item.name));
-				li.setAttribute('data-id', item.id);
-				list.appendChild(li);
-			}
-		}
+          const startIndex = (pageNumber - 1) * 1000;
+          const endIndex = startIndex + 1000;
+          const itemsToShow = items.slice(startIndex, endIndex);
 
-		// 显示详细信息
-		function showDetail(id) {
-			const item = dataList.find(item => item.id === id);
-			const detail = document.querySelector('#detail');
-			detail.innerHTML = `
-				<p>id: ${item.id}</p>
-				<p>type: ${item.type}</p>
-				<p>msg: ${item.msg}</p>
-			`;
-			detail.style.display = 'block';
-		}
-	</script>
+          itemsToShow.forEach(item => {
+            const itemHTML = createItemHTML(item);
+            itemsDiv.insertAdjacentHTML('beforeend', itemHTML);
+          });
+        }
+
+        // 显示分页
+        function showPagination(pageNumber) {
+          const paginationDiv = document.querySelector('.pagination');
+          paginationDiv.innerHTML = '';
+
+          const pageCount = Math.ceil(items.length / 1000);
+          for (let i = 1; i <= pageCount; i++) {
+            const linkHTML = `<a href="#" data-page="${i}"${i === pageNumber ? ' class="active"' : ''}>${i}</a>`;
+            paginationDiv.insertAdjacentHTML('beforeend', linkHTML);
+          }
+
+          // 绑定分页链接点击事件
+          paginationDiv.addEventListener('click', event => {
+            event.preventDefault();
+            const link = event.target.closest('a');
+            if (link) {
+              const pageNumber = parseInt(link.dataset.page);
+              showItems(pageNumber);
+              showPagination(pageNumber);
+            }
+          });
+        }
+
+        // 绑定项点击事件
+        document.getElementById('items').addEventListener('click', event => {
+          const itemDiv = event.target.closest('.item');
+          if (itemDiv) {
+            const id = itemDiv.dataset.id;
+            const item = items.find(item => item.id === id);
+            alert(`id: ${item.id}\ntype: ${item.type}\nmsg: ${item.msg}`);
+          }
+        });
+
+        // 绑定搜索框输入事件
+        document.getElementById('search').addEventListener('input', event => {
+          const query = event.target.value.trim().toLowerCase();
+          const filteredItems = items.filter(item => item.name.toLowerCase().includes(query));
+          showItems(1);
+          showPagination(1, filteredItems);
+        });
+
+        // 初始化展示第一页
+        showItems(1);
+        showPagination(1);
+      });
+  </script>
 </body>
 </html>
