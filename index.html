@@ -39,17 +39,23 @@
 		}
 		.pagination {
 			margin-top: 20px;
-			text-align: right;
+			text-align: left; /* 修改为左对齐 */
 		}
 		.page-info {
 			font-size: 14px;
 			font-weight: bold;
 			margin-right: 10px;
 		}
+		.search-info { /* 新增样式 */
+			font-size: 16px;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
 	</style>
 </head>
 <body>
 	<h1>分页展示示例</h1>
+	<div id="searchInfo"></div> <!-- 新增搜索信息显示区域 -->
 	<input type="text" id="searchInput" placeholder="搜索...">
 	<button id="searchButton">搜索</button>
 	<div id="tableContainer"></div>
@@ -74,6 +80,7 @@
 				const tableContainer = document.getElementById('tableContainer');
 				const searchInput = document.getElementById('searchInput');
 				const searchButton = document.getElementById('searchButton');
+				const searchInfo = document.getElementById('searchInfo'); // 获取搜索信息显示区域
 				renderTable();
 
 				// 渲染表格
@@ -109,7 +116,10 @@
 						id.textContent = item.id;
 						const name = document.createElement('div');
 						name.textContent = item.name;
-						itemContainer.appendChild(id);
+						const type = document.createElement('div'); // 新增type显示
+						type.textContent = item.type;
+						const msg = document.createElement('div'); // 新增msg显示
+						msg.textContent = item.msg;
 						itemContainer.appendChild(img);
 						itemContainer.appendChild(name);
 						td.appendChild(itemContainer);
@@ -169,6 +179,7 @@
 						filteredItems = items.filter(item => item.type === type);
 						currentPage = 1;
 						renderTable();
+						searchInfo.textContent = `类型：${type}`; // 修改搜索信息显示
 					});
 					return button;
 				});
@@ -185,12 +196,14 @@
 						if (filteredItems.length > 0) {
 							currentPage = 1;
 							renderTable();
+							searchInfo.textContent = `搜索：${keyword}`; // 修改搜索信息显示
 						} else {
 							alert('没有找到匹配项。');
 						}
 					} else {
 						filteredItems = items;
 						renderTable();
+						searchInfo.textContent = ''; // 清空搜索信息显示
 					}
 				});
 			})
