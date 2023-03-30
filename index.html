@@ -3,6 +3,45 @@
 <head>
 	<title>分页展示示例</title>
 	<meta charset="UTF-8">
+	<style>
+		.table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0; /* 去除空白间距 */
+		}
+		.table th {
+			padding: 10px;
+			background-color: #eee;
+			text-align: left;
+		}
+		.table td {
+			padding: 10px;
+			text-align: center;
+		}
+		.item-container {
+			display: inline-block;
+			width: 100px;
+			height: 120px;
+			margin: 10px;
+			text-align: center;
+		}
+		.item-container img {
+			width: 80px;
+			height: 80px;
+			margin-bottom: 10px;
+		}
+		.item-container div {
+			font-size: 14px;
+			font-weight: bold;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.pagination {
+			margin-top: 20px;
+			text-align: center;
+		}
+	</style>
 </head>
 <body>
 	<h1>分页展示示例</h1>
@@ -39,16 +78,14 @@
 
 					// 创建表格元素
 					const table = document.createElement('table');
+					table.classList.add('table');
 
 					// 创建表头
 					const thead = document.createElement('thead');
 					const tr = document.createElement('tr');
-					const th1 = document.createElement('th');
-					const th2 = document.createElement('th');
-					th1.textContent = '图标';
-					th2.textContent = '名称';
-					tr.appendChild(th1);
-					tr.appendChild(th2);
+					const th = document.createElement('th');
+					th.textContent = `第 ${currentPage} 页`;
+					tr.appendChild(th);
 					thead.appendChild(tr);
 					table.appendChild(thead);
 
@@ -58,9 +95,7 @@
 					const endIndex = Math.min(startIndex + pageSize, items.length);
 					for (let i = startIndex; i < endIndex; i++) {
 						const item = items[i];
-						const tr = document.createElement('tr');
-						const td1 = document.createElement('td');
-						const td2 = document.createElement('td');
+						const td = document.createElement('td');
 						const itemContainer = document.createElement('div');
 						itemContainer.classList.add('item-container');
 						const img = document.createElement('img');
@@ -69,19 +104,20 @@
 						name.textContent = item.name;
 						itemContainer.appendChild(img);
 						itemContainer.appendChild(name);
-						td1.appendChild(itemContainer);
-						tr.appendChild(td1);
-						tr.appendChild(td2);
-						tr.addEventListener('click', () => {
-							// 点击行时显示详情
-							alert(`ID: ${item.id}\nType: ${item.type}\nMessage: ${item.msg}`);
-						});
-						tbody.appendChild(tr);
+						td.appendChild(itemContainer);
+						tbody.appendChild(td);
+						if ((i + 1) % 10 === 0) {
+							const tr = document.createElement('tr');
+							tr.appendChild(tbody);
+							table.appendChild(tr);
+							tbody = document.createElement('tbody');
+						}
 					}
 					table.appendChild(tbody);
 
 					// 创建分页控件
 					const pagination = document.createElement('div');
+					pagination.classList.add('pagination');
 					if (currentPage > 1) {
 						const prevButton = document.createElement('button');
 						prevButton.textContent = '上一页';
