@@ -58,7 +58,9 @@
 	<div id="searchInfo"></div> <!-- 新增搜索信息显示区域 -->
 	<input type="text" id="searchInput" placeholder="搜索...">
 	<button id="searchButton">搜索</button>
+	<div id="typeContainer"></div> <!-- 新增分类按钮显示区域 -->
 	<div id="tableContainer"></div>
+	<div id="paginationContainer"></div> <!-- 新增分页控件显示区域 -->
 
 	<script>
 		// 读取数据文件
@@ -81,6 +83,8 @@
 				const searchInput = document.getElementById('searchInput');
 				const searchButton = document.getElementById('searchButton');
 				const searchInfo = document.getElementById('searchInfo'); // 获取搜索信息显示区域
+				const typeContainer = document.getElementById('typeContainer'); // 获取分类按钮显示区域
+				const paginationContainer = document.getElementById('paginationContainer'); // 获取分页控件显示区域
 				renderTable();
 
 				// 渲染表格
@@ -112,8 +116,6 @@
 						itemContainer.classList.add('item-container');
 						const img = document.createElement('img');
 						img.src = `ico/${item.id}.png`;
-						const id = document.createElement('div');
-						id.textContent = item.id;
 						const name = document.createElement('div');
 						name.textContent = item.name;
 						const type = document.createElement('div'); // 新增type显示
@@ -122,6 +124,8 @@
 						msg.textContent = item.msg;
 						itemContainer.appendChild(img);
 						itemContainer.appendChild(name);
+						itemContainer.appendChild(type); // 添加type显示
+						itemContainer.appendChild(msg); // 添加msg显示
 						td.appendChild(itemContainer);
 						td.addEventListener('click', () => {
 							alert(`ID: ${item.id}\nType: ${item.type}\nMessage: ${item.msg}`);
@@ -135,6 +139,23 @@
 						}
 					}
 					table.appendChild(tbody);
+
+					// 创建分类按钮
+					const types = Array.from(new Set(items.map(item => item.type))); // 获取所有不重复的type
+					const typeButtons = types.map(type => {
+						const button = document.createElement('button');
+						button.textContent = type;
+						button.addEventListener('click', () => {
+							filteredItems = items.filter(item => item.type === type);
+							currentPage = 1;
+							renderTable();
+							searchInfo.textContent = `类型：${type}`; // 修改搜索信息显示
+						});
+						return button;
+					});
+					typeContainer.innerHTML = ''; // 清空分类按钮显示区域
+					typeContainer.appendChild(document.createTextNode('按类型筛选：'));
+					typeButtons.forEach(button => typeContainer.appendChild(button));
 
 					// 创建分页控件
 					const pagination = document.createElement('div');
@@ -161,32 +182,15 @@
 						});
 						pagination.appendChild(nextButton);
 					}
-					tableContainer.appendChild(table);
-					tableContainer.appendChild(pagination);
+					paginationContainer.innerHTML = ''; // 清空分页控件显示区域
+					paginationContainer.appendChild(pagination);
+					paginationContainer.appendChild(typeContainer); // 将分类按钮移到分页控件上面
 				}
 
 				// 计算总页数
 				function totalPages() {
 					return Math.ceil(filteredItems.length / pageSize);
 				}
-
-				// 分类功能
-				const types = Array.from(new Set(items.map(item => item.type))); // 获取所有不重复的type
-				const typeButtons = types.map(type => {
-					const button = document.createElement('button');
-					button.textContent = type;
-					button.addEventListener('click', () => {
-						filteredItems = items.filter(item => item.type === type);
-						currentPage = 1;
-						renderTable();
-						searchInfo.textContent = `类型：${type}`; // 修改搜索信息显示
-					});
-					return button;
-				});
-				const typeContainer = document.createElement('div');
-				typeContainer.appendChild(document.createTextNode('按类型筛选：'));
-				typeButtons.forEach(button => typeContainer.appendChild(button));
-				document.body.insertBefore(typeContainer, tableContainer);
 
 				// 搜索功能
 				searchButton.addEventListener('click', () => {
