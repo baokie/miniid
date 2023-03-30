@@ -2,18 +2,108 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>读取本地文件</title>
+	<title>分页展示</title>
+	<style>
+		/* 样式定义 */
+		#list {
+			list-style: none;
+			padding-left: 0;
+		}
+		#list li {
+			display: flex;
+			align-items: center;
+			margin-bottom: 10px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		#list li:hover {
+			background-color: #f0f0f0;
+		}
+		#list li img {
+			width: 50px;
+			height: 50px;
+			margin-right: 10px;
+		}
+		#detail {
+			display: none;
+			margin-top: 10px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+		}
+	</style>
 </head>
 <body>
-	<p id="content"></p>
+	<!-- 搜索框 -->
+	<input type="text" id="search" placeholder="搜索...">
+	<!-- 列表 -->
+	<ul id="list"></ul>
+	<!-- 详细信息 -->
+	<div id="detail"></div>
 
 	<script>
-		const filePath = 'data.txt';
-		fetch(filePath)
+		// 读取数据文件
+		const dataUrl = 'data.txt';
+		const iconUrl = 'ico/';
+		let dataList = [];
+		fetch(dataUrl)
 			.then(response => response.text())
 			.then(text => {
-				document.querySelector('#content').textContent = text;
+				// 解析数据
+				dataList = text.trim().split(/\s*,\s*/).map(item => {
+					const [id, name, type, msg] = item.match(/id:(\d+),name:(.+),type:(\d+),msg:(.+)/).slice(1);
+					return { id, name, type, msg };
+				});
+				// 初始化显示
+				showList(1);
 			});
+
+		// 搜索框绑定事件
+		const searchInput = document.querySelector('#search');
+		searchInput.addEventListener('input', () => {
+			showList(1, searchInput.value.trim());
+		});
+
+		// 列表绑定事件
+		const list = document.querySelector('#list');
+		list.addEventListener('click', event => {
+			const id = event.target.getAttribute('data-id');
+			if (id) {
+				showDetail(id);
+			}
+		});
+
+		// 显示列表
+		function showList(pageNum, keyword = '') {
+			const startIndex = (pageNum - 1) * 1000;
+			const endIndex = startIndex + 1000;
+			const filteredList = dataList.filter(item => item.name.includes(keyword));
+			const pageList = filteredList.slice(startIndex, endIndex);
+			list.innerHTML = '';
+			for (const item of pageList) {
+				const li = document.createElement('li');
+				const img = document.createElement('img');
+				img.src = `${iconUrl}${item.id}.png`;
+				li.appendChild(img);
+				li.appendChild(document.createTextNode(item.name));
+				li.setAttribute('data-id', item.id);
+				list.appendChild(li);
+			}
+		}
+
+		// 显示详细信息
+		function showDetail(id) {
+			const item = dataList.find(item => item.id === id);
+			const detail = document.querySelector('#detail');
+			detail.innerHTML = `
+				<p>id: ${item.id}</p>
+				<p>type: ${item.type}</p>
+				<p>msg: ${item.msg}</p>
+			`;
+			detail.style.display = 'block';
+		}
 	</script>
 </body>
 </html>
