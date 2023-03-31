@@ -60,6 +60,8 @@
 	<button id="searchButton">搜索</button>
 	<div id="typeContainer"></div> <!-- 新增分类按钮显示区域 -->
 	<div id="paginationContainer"></div> <!-- 新增分页控件显示区域 -->
+	<input type="text" id="pageInput" placeholder="页码...">
+	<button id="pageButton">跳页</button>
 	<div id="tableContainer"></div>
 
 	<script>
@@ -83,6 +85,8 @@
 				const tableContainer = document.getElementById('tableContainer');
 				const searchInput = document.getElementById('searchInput');
 				const searchButton = document.getElementById('searchButton');
+				const pageInput = document.getElementById('pageInput');
+				const pageButton = document.getElementById('pageButton');
 				const searchInfo = document.getElementById('searchInfo'); // 获取搜索信息显示区域
 				const typeContainer = document.getElementById('typeContainer'); // 获取分类按钮显示区域
 				const paginationContainer = document.getElementById('paginationContainer'); // 获取分页控件显示区域
@@ -212,6 +216,15 @@
 						filteredItems = items;
 						renderTable();
 						searchInfo.textContent = ''; // 清空搜索信息显示
+					}
+				});
+				// 跳页功能
+				pageButton.addEventListener('click', () => {
+					var input = pageInput.value; // 获取输入框的值
+					var num = parseInt(input, 10); // 将输入框的值转换成整数
+					if (!isNaN(num) && num > 0 && num < totalPages() + 1) { 
+						currentPage = num;
+						renderTable();
 					}
 				});
 			})
