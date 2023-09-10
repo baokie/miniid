@@ -91,8 +91,9 @@
 
 				// 设置每页显示的数量
 				//let count = (window.innerWidth > window.innerHeight) ? 10 : 7;
-				let count = Math.floor(window.innerWidth / 140);
-				const pageSize = count * 20;
+				let count = 0;
+				let pageSize = 0;
+				evalPageItemCount();
 
 				// 初始化分页和搜索
 				let currentPage = 1;
@@ -105,7 +106,14 @@
 				const searchInfo = document.getElementById('searchInfo'); // 获取搜索信息显示区域
 				const typeContainer = document.getElementById('typeContainer'); // 获取分类按钮显示区域
 				const paginationContainer = document.getElementById('paginationContainer'); // 获取分页控件显示区域
+
 				renderTable();
+
+				//计算分页应包含物品的多少以及每行物品数量
+				function evalPageItemCount() {
+					count = Math.floor(window.innerWidth / 140);
+					pageSize = count * 20;
+				}
 
 				// 渲染表格
 				function renderTable() {
@@ -215,6 +223,12 @@
 					return Math.ceil(filteredItems.length / pageSize);
 				}
 
+				// 监听视窗大小变化，实时改变每页物品数量
+				window.addEventListener("resize", function() {
+					evalPageItemCount();
+					renderTable(); // 重新渲染
+				});
+
 				// 搜索功能
 				searchButton.addEventListener('click', () => {
 					const keyword = searchInput.value.trim().toLowerCase();
@@ -237,9 +251,12 @@
 				pageButton.addEventListener('click', () => {
 					var input = pageInput.value; // 获取输入框的值
 					var num = parseInt(input, 10); // 将输入框的值转换成整数
-					if (!isNaN(num) && num > 0 && num < totalPages() + 1) { 
+					var totalPage = totalPages();
+					if (!isNaN(num) && num > 0 && num <= totalPage) { 
 						currentPage = num;
 						renderTable();
+					} else {
+						alert(num > totalPage ? `超过最大页数, 最大页数: ${totalPage}` :`输入数据不合法: ${input}`);
 					}
 				});
 			})
